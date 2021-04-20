@@ -1,6 +1,10 @@
+/**
+@author curiosity2620
+@date 2019 / 3 / 12 - 20:43
+*/
 #include <reg52.h>
 #define uint unsigned int   
-unsigned char a;
+unsigned char data;
 sbit M=P3^5;//此引脚接舵机信号线
 sbit N=P2^0;//或此引脚接舵机信号线
 sbit led=P3^6;
@@ -26,13 +30,13 @@ void main()
 
 void Usart() interrupt 4 //中断处理函数，中断号为4
 {  
-   a=SBUF;//发送接收数据缓存空间
+   data=SBUF;//发送接收数据缓存空间
    RI=0;//接收中断标志位
-   SBUF=a;//原样返回接收的数
-   while(!TI);
+   SBUF=data;//原样返回接收的数
+   while(!TI);//如果发送了数据则继续向后运行
    TI=0;//发送中断标志位
    
-   if(a=='D')//如果接收到数据D，让舵机转动
+   if(data=='D')//(door)如果接收到数据D，让舵机转动
   { 
             int b=0;//用于控制产生的pwm信号段长度，每个不同的pwm段对应一个舵机角度，因此控制了舵机在某角度停留的时长
             while(b<30)//产生pwm信号，控制舵机转动到起始角度
@@ -61,10 +65,9 @@ void Usart() interrupt 4 //中断处理函数，中断号为4
 	             delayms(19);
 	             b++;
             }
-
    }
   	
-   if(a=='L')//如果接收到的数据L，让LED反转
+   if(data=='L')//(led)如果接收到的数据L，让LED反转
    {
      led=~led;
    }
@@ -77,5 +80,3 @@ for(i=xms;i>0;i--)
    for(j=110;j>0;j--);
 
 }
-
-
